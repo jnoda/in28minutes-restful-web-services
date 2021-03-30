@@ -1,5 +1,7 @@
 package com.julionoda.in28minutes.rest.webservices.users;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -7,6 +9,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.Objects;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class UserController {
@@ -22,14 +27,22 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    public User findById(@PathVariable Integer id) {
-        return userRepository.findById(id)
+    public EntityModel<User> findById(@PathVariable Integer id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("id-" + id));
+
+        EntityModel<User> resource = EntityModel.of(user);
+        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).findAll());
+        resource.add(linkTo.withRel("all-users"));
+
+        return resource;
     }
 
     @DeleteMapping("/users/{id}")
     public void deleteById(@PathVariable Integer id) {
-        User user = findById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("id-" + id));
+
         userRepository.delete(user);
     }
 
