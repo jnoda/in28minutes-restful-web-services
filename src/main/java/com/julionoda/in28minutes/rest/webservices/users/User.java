@@ -6,6 +6,9 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Entity
@@ -17,6 +20,10 @@ public class User {
     @EqualsAndHashCode.Include
     private Integer id;
 
+    @NotBlank
+    @Size(min = 2, message = "name must have at least {min} characters")
     private String name;
+
+    @Past
     private LocalDate birthDate;
 }
