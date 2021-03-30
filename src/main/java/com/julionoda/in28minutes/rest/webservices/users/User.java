@@ -1,5 +1,6 @@
 package com.julionoda.in28minutes.rest.webservices.users;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @Entity
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Schema(name = "User", description = "Stores a user.")
 public class User {
     @Id
     @GeneratedValue
@@ -25,5 +27,6 @@ public class User {
     private String name;
 
     @Past
+    @Schema(description = "Birth date. Should be on the past.")
     private LocalDate birthDate;
 }
