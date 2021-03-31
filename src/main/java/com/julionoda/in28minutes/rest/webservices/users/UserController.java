@@ -8,6 +8,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -16,13 +17,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 public class UserController {
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository,
+                          PostRepository postRepository) {
+
         this.userRepository = Objects.requireNonNull(userRepository);
+        this.postRepository = Objects.requireNonNull(postRepository);
     }
 
     @GetMapping("/users")
-    public Iterable<User> findAll() {
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 
@@ -56,5 +61,30 @@ public class UserController {
         return ResponseEntity
                 .created(location)
                 .body(createdUser);
+    }
+
+    @GetMapping("/users/{id}/posts")
+    public List<Post> findAll(@PathVariable Integer id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("id-" + id));
+
+        return user.getPosts();
+    }
+
+    @PostMapping("/users/{id}/posts")
+    public ResponseEntity<Post> save(@PathVariable Integer id, @Valid @RequestBody Post post) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("id-" + id));
+
+        post.setUser(user);
+        Post createdPost = postRepository.save(post);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{postId}")
+                .buildAndExpand(createdPost.getId())
+                .toUri();
+
+        return ResponseEntity
+                .created(location)
+                .body(createdPost);
     }
 }

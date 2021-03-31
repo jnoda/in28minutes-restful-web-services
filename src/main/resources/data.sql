@@ -1,0 +1,8 @@
+INSERT INTO USER (ID, NAME, BIRTH_DATE)
+VALUES (1001, 'ALLAN', '1991-01-01'),
+       (1002, 'BETTY', '1992-02-02'),
+       (1003, 'CHARLIE', '1993-03-03');
+
+INSERT INTO POST (ID, USER_ID, DESCRIPTION)
+VALUES (1101, 1001, 'My first post'),
+       (1102, 1002, 'My second post');
